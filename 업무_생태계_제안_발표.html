@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>협업 생태계 혁신 제안 PT</title>
+    <!-- Toss-style Modern Font (Pretendard) -->
+    <style>
+        @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #000000;
+            color: #191f28;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 16:9 Presentation Container */
+        .presentation-container {
+            position: relative;
+            width: 100vw;
+            height: calc(100vw * 9 / 16);
+            max-height: 100vh;
+            max-width: calc(100vh * 16 / 9);
+            background: #ffffff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Top Header & Progress Bar */
+        header {
+            width: 100%;
+            padding: 1.2% 3%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 10;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .logo {
+            font-size: clamp(14px, 1.2vw, 20px);
+            font-weight: 800;
+            color: #3182f6;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: #4e5968;
+            font-weight: 500;
+            font-size: clamp(11px, 0.9vw, 16px);
+        }
+
+        .badge {
+            background-color: #e8f3ff;
+            color: #3182f6;
+            padding: 0.3% 0.8%;
+            border-radius: 100px;
+            font-size: clamp(10px, 0.75vw, 13px);
+            font-weight: 700;
+        }
+
+        /* Top Progress Bar indicator */
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 8.33%;
+            background: #3182f6;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Main Viewport for Slider */
+        .slides-viewport {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Horizontal Slider Wrapper */
+        .slides-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Individual Slide */
+        .slide {
+            width: 100%;
+            min-width: 100%;
+            height: 100%;
+            padding: 7% 5.5% 6% 5.5%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        /* Slide Content Spacing & Max Width */
+        .slide-content {
+            width: 100%;
+            max-width: 92%;
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+        }
+
+        /* Segment Label */
+        .segment-label {
+            color: #3182f6;
+            font-weight: 700;
+            font-size: clamp(11px, 0.85vw, 15px);
+            margin-bottom: 0.6em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Slide Headings */
+        .slide-title {
+            font-size: clamp(24px, 2.6vw, 46px);
+            font-weight: 800;
+            line-height: 1.3;
+            letter-spacing: -1.5px;
+            margin-bottom: 0.4em;
+            color: #191f28;
+        }
+
+        .slide-title span.gradient {
+            background: linear-gradient(135deg, #3182f6 0%, #1c5cd9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-desc {
+            font-size: clamp(13px, 1.1vw, 20px);
+            color: #4e5968;
+            line-height: 1.55;
+            margin-bottom: 1.8em;
+            font-weight: 500;
+        }
+
+        /* Scroll Up Animation */
+        .animate-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide.active-slide .animate-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.15s; }
+        .delay-2 { transition-delay: 0.3s; }
+        .delay-3 { transition-delay: 0.45s; }
+        .delay-4 { transition-delay: 0.6s; }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(16px, 1.8vw, 32px);
+            width: 100%;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(12px, 1.4vw, 24px);
+            width: 100%;
+        }
+
+        /* Premium Minimalist Cards */
+        .card {
+            background: #f9fafb;
+            border-radius: clamp(14px, 1.4vw, 24px);
+            padding: clamp(18px, 2vw, 36px);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+            background: #ffffff;
+            border-color: rgba(49, 130, 246, 0.1);
+        }
+
+        .card-num {
+            font-size: clamp(11px, 0.85vw, 16px);
+            font-weight: 700;
+            color: #b0b8c1;
+            margin-bottom: 0.7em;
+        }
+
+        .card h3 {
+            font-size: clamp(14px, 1.2vw, 22px);
+            font-weight: 700;
+            margin-bottom: 0.6em;
+            color: #191f28;
+        }
+
+        .card p {
+            font-size: clamp(11px, 0.82vw, 15px);
+            color: #4e5968;
+            line-height: 1.55;
+        }
+
+        .card-bullet {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 0.6em;
+            font-size: clamp(11px, 0.78vw, 14px);
+            color: #6b7684;
+            line-height: 1.5;
+        }
+
+        .card-bullet::before {
+            content: "•";
+            color: #3182f6;
+            font-weight: bold;
+        }
+
+        /* Interactive / Visual Components */
+        
+        /* 1. SpreadSheet Mockup */
+        .sheet-mockup {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e5e8eb;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            width: 100%;
+        }
+
+        .sheet-header {
+            background: #f2f4f6;
+            padding: 0.5em 1em;
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid #e5e8eb;
+            font-size: clamp(10px, 0.72vw, 13px);
+            color: #4e5968;
+            font-weight: 600;
+        }
+
+        .sheet-row {
+            display: grid;
+            grid-template-columns: 80px 120px 1fr 100px;
+            border-bottom: 1px solid #f2f4f6;
+            font-size: clamp(10px, 0.72vw, 13px);
+        }
+
+        .sheet-cell {
+            padding: 0.6em 1em;
+            color: #191f28;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        .sheet-cell.header-cell {
+            background: #f9fafb;
+            color: #8b95a1;
+            font-weight: 600;
+            border-right: 1px solid #f2f4f6;
+            border-bottom: 1px solid #e5e8eb;
+        }
+
+        .sheet-cell.crossed {
+            color: #f04438;
+            font-weight: 600;
+        }
+
+        /* 2. Chat Mockup */
+        .chat-mockup {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e8eb;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            width: 100%;
+            padding: clamp(12px, 1.4vw, 24px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .chat-bubble {
+            display: flex;
+            flex-direction: column;
+            max-width: 75%;
+            padding: clamp(10px, 0.9vw, 16px);
+            border-radius: 14px;
+            font-size: clamp(11px, 0.78vw, 14px);
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .chat-bubble.receiver {
+            background: #f2f4f6;
+            color: #191f28;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-bubble.sender {
+            background: #3182f6;
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-time {
+            font-size: clamp(9px, 0.6vw, 11px);
+            color: #8b95a1;
+            margin-top: 4px;
+            align-self: flex-end;
+        }
+
+        .chat-bubble.sender .chat-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .chat-warning-badge {
+            background: rgba(240, 68, 56, 0.1);
+            color: #f04438;
+            border: 1px solid rgba(240, 68, 56, 0.2);
+            padding: 0.4em 0.7em;
+            border-radius: 6px;
+            font-size: clamp(9px, 0.65vw, 12px);
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        /* 3. File List Mockup */
+        .file-mockup {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e8eb;
+            padding: clamp(12px, 1.4vw, 24px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7em;
+            border-radius: 10px;
+            background: #f9fafb;
+            margin-bottom: 0.6em;
+            border: 1px solid rgba(0, 0, 0, 0.01);
+            font-size: clamp(11px, 0.78vw, 14px);
+        }
+
+        .file-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #4e5968;
+        }
+
+        .file-status-bad {
+            color: #f04438;
+            font-weight: 700;
+            font-size: clamp(9px, 0.65vw, 12px);
+        }
+
+        /* 4. Architecture Interaction */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(12px, 1.1vw, 20px);
+            width: 100%;
+            margin-top: 0.8em;
+        }
+
+        .arch-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: clamp(16px, 1.6vw, 32px) clamp(14px, 1.3vw, 24px);
+            text-align: center;
+            border: 1px solid #e5e8eb;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.01);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .arch-card:hover {
+            transform: scale(1.03);
+            border-color: #3182f6;
+            box-shadow: 0 10px 24px rgba(49, 130, 246, 0.08);
+        }
+
+        .arch-logo-wrapper {
+            width: clamp(36px, 3.2vw, 56px);
+            height: clamp(36px, 3.2vw, 56px);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.8em auto;
+            font-size: clamp(16px, 1.5vw, 28px);
+            color: #ffffff;
+        }
+
+        .arch-card.slack .arch-logo-wrapper { background: #4a154b; }
+        .arch-card.drive .arch-logo-wrapper { background: #34a853; }
+        .arch-card.notion .arch-logo-wrapper { background: #000000; }
+        .arch-card.calendar .arch-logo-wrapper { background: #4285f4; }
+
+        .arch-card h4 {
+            font-size: clamp(12px, 1vw, 18px);
+            font-weight: 700;
+            margin-bottom: 0.4em;
+            color: #191f28;
+        }
+
+        .arch-card p {
+            font-size: clamp(10px, 0.72vw, 13px);
+            color: #8b95a1;
+            line-height: 1.45;
+        }
+
+        /* 5. Slack Mockup */
+        .slack-mockup {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e8eb;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            height: clamp(200px, 18vw, 300px);
+        }
+
+        .slack-sidebar {
+            background: #3f0e40;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 1em;
+            font-size: clamp(10px, 0.72vw, 13px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slack-sidebar-channel {
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.3em 0.5em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slack-body {
+            padding: clamp(12px, 1.3vw, 24px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #ffffff;
+        }
+
+        .slack-msg {
+            display: flex;
+            gap: 10px;
+        }
+
+        .slack-avatar {
+            width: clamp(26px, 2vw, 36px);
+            height: clamp(26px, 2vw, 36px);
+            border-radius: 6px;
+            background: #3182f6;
+            color: white;
+            font-weight: 700;
+            font-size: clamp(10px, 0.78vw, 14px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .slack-msg-content h5 {
+            font-size: clamp(11px, 0.78vw, 14px);
+            font-weight: 700;
+            color: #191f28;
+            margin-bottom: 3px;
+        }
+
+        .slack-msg-content p {
+            font-size: clamp(11px, 0.78vw, 14px);
+            color: #4e5968;
+            line-height: 1.45;
+        }
+
+        .slack-thread-btn {
+            background: #f2f4f6;
+            border: none;
+            color: #3182f6;
+            padding: 0.3em 0.7em;
+            border-radius: 6px;
+            font-size: clamp(9px, 0.65vw, 12px);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+
+        .slack-thread-btn:hover {
+            background: #e8f3ff;
+        }
+
+        .slack-thread-panel {
+            background: #f9fafb;
+            border-left: 2px solid #e5e8eb;
+            padding: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* 6. Notion Kanban Mockup */
+        .kanban-mockup {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e8eb;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            padding: clamp(12px, 1.3vw, 24px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+        }
+
+        .kanban-cols {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            height: clamp(120px, 11vw, 180px);
+        }
+
+        .kanban-col {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 0.6em;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        .kanban-col-title {
+            font-size: clamp(10px, 0.72vw, 13px);
+            font-weight: 700;
+            color: #4e5968;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .kanban-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 0.6em;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e5e8eb;
+            font-size: clamp(10px, 0.72vw, 13px);
+            font-weight: 600;
+            color: #191f28;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .kanban-tag {
+            font-size: clamp(8px, 0.55vw, 10px);
+            padding: 2px 5px;
+            background: #e8f3ff;
+            color: #3182f6;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .demo-btn {
+            background: #3182f6;
+            color: white;
+            border: none;
+            padding: 0.4em 1em;
+            font-weight: 700;
+            font-size: clamp(10px, 0.72vw, 13px);
+            border-radius: 8px;
+            cursor: pointer;
+            align-self: center;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .demo-btn:hover {
+            background: #1c5cd9;
+            transform: scale(1.02);
+        }
+
+        /* 7. Google Drive & Calendar Sync Mockup */
+        .sync-mockup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(14px, 1.4vw, 24px);
+            width: 100%;
+        }
+
+        .sync-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e8eb;
+            padding: clamp(14px, 1.4vw, 24px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sync-card-title {
+            font-size: clamp(12px, 0.85vw, 15px);
+            font-weight: 700;
+            color: #191f28;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drive-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: clamp(10px, 0.72vw, 13px);
+        }
+
+        .drive-node {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4e5968;
+            padding: 0.35em 0.7em;
+            border-radius: 6px;
+            background: #f9fafb;
+        }
+
+        .drive-node.active-node {
+            background: #e8f3ff;
+            color: #3182f6;
+            font-weight: 600;
+        }
+
+        .cal-event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cal-event {
+            border-left: 4px solid #4285f4;
+            background: #f4f8ff;
+            padding: 0.5em 0.8em;
+            border-radius: 4px;
+            font-size: clamp(10px, 0.72vw, 13px);
+        }
+
+        .cal-event h6 {
+            font-weight: 700;
+            color: #191f28;
+            margin-bottom: 2px;
+        }
+
+        .cal-event p {
+            color: #4e5968;
+            font-size: clamp(9px, 0.6vw, 11px);
+        }
+
+        /* 8. Comparison UI (Slide 10) — Before & After */
+        .summary-box {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: clamp(10px, 1vw, 20px);
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .summary-col {
+            background: #ffffff;
+            border-radius: clamp(14px, 1.4vw, 24px);
+            border: 1px solid #e5e8eb;
+            padding: clamp(20px, 2vw, 36px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(12px, 1.2vw, 20px);
+        }
+
+        .summary-col.bad-col {
+            border-top: 6px solid #f04438;
+        }
+
+        .summary-col.good-col {
+            border-top: 6px solid #3182f6;
+            background: #ffffff;
+        }
+
+        .summary-col h4 {
+            font-size: clamp(14px, 1.1vw, 20px);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(10px, 1vw, 18px);
+        }
+
+        .summary-item {
+            font-size: clamp(12px, 0.85vw, 15px);
+            line-height: 1.55;
+            color: #4e5968;
+            padding: clamp(8px, 0.7vw, 14px) clamp(10px, 1vw, 16px);
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .summary-item span.highlight {
+            color: #f04438;
+            font-weight: 600;
+        }
+
+        .summary-col.good-col .summary-item {
+            background: #f0f6ff;
+            border-color: rgba(49, 130, 246, 0.06);
+        }
+
+        .summary-col.good-col .summary-item span.highlight {
+            color: #3182f6;
+            font-weight: 700;
+        }
+
+        .summary-arrow {
+            text-align: center;
+            font-size: clamp(20px, 1.8vw, 32px);
+            color: #b0b8c1;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 9. Metrics/ROI UI */
+        .metric-card {
+            background: #ffffff;
+            border-radius: clamp(14px, 1.4vw, 24px);
+            border: 1px solid #e5e8eb;
+            padding: clamp(20px, 2.2vw, 40px) clamp(16px, 1.8vw, 32px);
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
+        }
+
+        .metric-value {
+            font-size: clamp(36px, 3.6vw, 64px);
+            font-weight: 800;
+            color: #3182f6;
+            line-height: 1;
+            margin-bottom: 0.3em;
+            letter-spacing: -2px;
+        }
+
+        .metric-title {
+            font-size: clamp(12px, 1vw, 18px);
+            font-weight: 700;
+            color: #191f28;
+            margin-bottom: 0.5em;
+        }
+
+        .metric-desc {
+            font-size: clamp(11px, 0.78vw, 14px);
+            color: #6b7684;
+            line-height: 1.5;
+        }
+
+        /* 10. Roadmap & Rules UI */
+        .roadmap-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(12px, 1.3vw, 24px);
+            width: 100%;
+            margin-bottom: clamp(14px, 1.6vw, 28px);
+        }
+
+        .roadmap-step {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e8eb;
+            padding: clamp(14px, 1.3vw, 24px);
+            position: relative;
+        }
+
+        .roadmap-step-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.6em;
+        }
+
+        .roadmap-badge {
+            width: clamp(20px, 1.6vw, 28px);
+            height: clamp(20px, 1.6vw, 28px);
+            background: #e8f3ff;
+            color: #3182f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: clamp(10px, 0.78vw, 14px);
+        }
+
+        .roadmap-step.active-step {
+            border-color: #3182f6;
+            box-shadow: 0 6px 20px rgba(49, 130, 246, 0.06);
+        }
+
+        .roadmap-step.active-step .roadmap-badge {
+            background: #3182f6;
+            color: white;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: clamp(8px, 0.9vw, 16px);
+            width: 100%;
+            margin-top: 0.8em;
+        }
+
+        .rule-item {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: clamp(10px, 1vw, 18px);
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.01);
+            font-size: clamp(10px, 0.72vw, 13px);
+            font-weight: 600;
+            color: #4e5968;
+            line-height: 1.35;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rule-icon {
+            font-size: clamp(14px, 1.1vw, 20px);
+        }
+
+        /* Footer Controls */
+        footer {
+            width: 100%;
+            padding: 1% 3%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+            z-index: 10;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .page-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: clamp(5px, 0.45vw, 8px);
+            height: clamp(5px, 0.45vw, 8px);
+            border-radius: 50%;
+            background-color: #e5e8eb;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dot.active {
+            width: clamp(12px, 1.1vw, 20px);
+            border-radius: 100px;
+            background-color: #3182f6;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: #e8f3ff;
+            color: #3182f6;
+            border: none;
+            outline: none;
+            width: clamp(28px, 2.4vw, 40px);
+            height: clamp(28px, 2.4vw, 40px);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(12px, 1vw, 18px);
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #3182f6;
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:disabled {
+            background: #f2f4f6;
+            color: #b0b8c1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .help-tip {
+            font-size: clamp(10px, 0.72vw, 13px);
+            color: #8b95a1;
+            font-weight: 500;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 11. Workflow Timeline UI */
+        .view-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.2em;
+            justify-content: flex-start;
+            width: 100%;
+        }
+        
+        .view-tab {
+            background: #f2f4f6;
+            color: #4e5968;
+            border: none;
+            outline: none;
+            padding: clamp(6px, 0.6vw, 12px) clamp(14px, 1.2vw, 24px);
+            border-radius: 100px;
+            font-size: clamp(11px, 0.8vw, 14px);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .view-tab.active {
+            background: #3182f6;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(49, 130, 246, 0.2);
+        }
+        
+        .view-tab:hover:not(.active) {
+            background: #e8f3ff;
+            color: #3182f6;
+        }
+        
+        .view-container {
+            width: 100%;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .view-container.active {
+            display: block;
+        }
+        
+        .interactive-kanban {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(8px, 0.8vw, 14px);
+            width: 100%;
+            height: clamp(230px, 21vw, 340px);
+            align-items: stretch;
+        }
+        
+        .kanban-col-interactive {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: clamp(8px, 0.8vw, 14px);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.01);
+            overflow-y: auto;
+        }
+        
+        .kanban-col-interactive::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .kanban-col-interactive::-webkit-scrollbar-thumb {
+            background: #e5e8eb;
+            border-radius: 4px;
+        }
+        
+        .kanban-col-header {
+            font-size: clamp(11px, 0.8vw, 13px);
+            font-weight: 800;
+            color: #191f28;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            padding: 0 4px;
+        }
+        
+        .kanban-col-count {
+            font-size: clamp(9px, 0.65vw, 11px);
+            background: #e5e8eb;
+            color: #4e5968;
+            padding: 1px 6px;
+            border-radius: 100px;
+            font-weight: 700;
+        }
+        
+        .interactive-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: clamp(8px, 0.75vw, 14px);
+            border: 1px solid #e5e8eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+            position: relative;
+        }
+        
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+            border-color: rgba(49, 130, 246, 0.2);
+        }
+        
+        .card-project {
+            font-size: clamp(8px, 0.55vw, 9px);
+            font-weight: 800;
+            color: #8b95a1;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .card-title {
+            font-size: clamp(10px, 0.75vw, 12px);
+            font-weight: 700;
+            color: #191f28;
+            line-height: 1.4;
+        }
+        
+        .card-footer-interactive {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1px;
+        }
+        
+        .card-assignee {
+            font-size: clamp(9px, 0.65vw, 11px);
+            font-weight: 600;
+            color: #4e5968;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .card-assignee::before {
+            content: "👤";
+            font-size: clamp(8px, 0.55vw, 10px);
+        }
+        
+        .card-tag {
+            font-size: clamp(8px, 0.55vw, 9px);
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+        
+        .card-tag.todo { background: #f2f4f6; color: #4e5968; }
+        .card-tag.progress { background: #e8f3ff; color: #3182f6; }
+        .card-tag.review { background: #fff3e0; color: #ff9800; }
+        .card-tag.done { background: #e8f5e9; color: #2e7d32; }
+        
+        .card-moving {
+            opacity: 0.3;
+            transform: scale(0.95);
+        }
+        
+        .interactive-timeline {
+            width: 100%;
+            background: #f9fafb;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            padding: clamp(12px, 1.1vw, 20px);
+            height: clamp(230px, 21vw, 340px);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .timeline-header-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            border-bottom: 1px solid #e5e8eb;
+            padding-bottom: 6px;
+        }
+        
+        .timeline-header-title {
+            font-size: clamp(10px, 0.75vw, 13px);
+            font-weight: 800;
+            color: #8b95a1;
+        }
+        
+        .timeline-grid-days {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            font-size: clamp(9px, 0.65vw, 11px);
+            font-weight: 700;
+            color: #8b95a1;
+        }
+        
+        .timeline-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .timeline-rows::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .timeline-rows::-webkit-scrollbar-thumb {
+            background: #e5e8eb;
+            border-radius: 4px;
+        }
+        
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            align-items: center;
+        }
+        
+        .timeline-row-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        
+        .timeline-row-project {
+            font-size: clamp(9px, 0.65vw, 11px);
+            font-weight: 800;
+            color: #191f28;
+        }
+        
+        .timeline-row-task {
+            font-size: clamp(8px, 0.55vw, 10px);
+            color: #8b95a1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .timeline-track {
+            position: relative;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 6px;
+            width: 100%;
+        }
+        
+        .timeline-bar {
+            position: absolute;
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: clamp(8px, 0.55vw, 10px);
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 2px 6px rgba(49, 130, 246, 0.1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .timeline-bar.alpha { background: linear-gradient(90deg, #3182f6 0%, #1c5cd9 100%); }
+        .timeline-bar.security { background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%); }
+        .timeline-bar.marketing { background: linear-gradient(90deg, #4caf50 0%, #388e3c 100%); }
+        .timeline-bar.chatbot { background: linear-gradient(90deg, #9c27b0 0%, #7b1fa2 100%); }
+        .timeline-bar.infra { background: linear-gradient(90deg, #607d8b 0%, #455a64 100%); }
+    </style>
+</head>
+<body>
+
+    <!-- 16:9 Presentation Container -->
+    <div class="presentation-container">
+
+    <!-- Header & Progress Bar -->
+    <header>
+        <div class="logo">WORK INNOVATION <span>협업 생태계 제안</span></div>
+        <div class="badge" id="slideIndicator">1 / 12</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- Main Viewport for Slider -->
+    <div class="slides-viewport">
+        <div class="slides-wrapper" id="slidesWrapper">
+            
+            <!-- Slide 1: Cover -->
+            <div class="slide active-slide">
+                <div class="slide-content cover-slide" style="text-align: center; align-items: center;">
+                    <span class="segment-label animate-up">Collaboration Proposal</span>
+                    <h1 class="slide-title animate-up delay-1" style="font-size: 56px; margin-bottom: 24px;">우리의 일하는 방식을<br><span class="gradient">새롭게 연결합니다</span></h1>
+                    <p class="slide-desc animate-up delay-2" style="max-width: 800px; margin-bottom: 48px;">
+                        <strong>독립적으로 작동하던 협업 자산들</strong>을 <strong>Notion 중심의 단일 생태계</strong>로 통합하여,<br><strong>지식 자산화</strong>와 <strong>실행 시너지를 극대화</strong>하는 제안
+                    </p>
+                    <div class="cover-meta animate-up delay-3" style="color: #8b95a1; font-size: 15px; font-weight: 500;">
+                        <p>Slack · Google Drive · Notion · Google Calendar</p>
+                        <p style="margin-top: 12px; font-weight: 700; color: #4e5968;">2026. 06</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: 현황 분석 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Current State</span>
+                    <h2 class="slide-title animate-up delay-1">이미 우리에게 정착된<br><span class="gradient">훌륭한 개별 협업 문화들</span></h2>
+                    <p class="slide-desc animate-up delay-2">우리 팀은 이미 각 도구를 활용해 <strong>높은 수준의 규칙</strong>을 지키고 있습니다.</p>
+                    
+                    <div class="grid-3 animate-up delay-3">
+                        <div class="card" style="border-top: 4px solid #4a154b;">
+                            <div class="card-num">ASSET 01</div>
+                            <h3>💬 Slack 스레드 소통</h3>
+                            <p><strong>공개 채널</strong>을 사용하고, <strong>DM을 지양</strong>하며 <strong>스레드를 기반</strong>으로 빠르게 논의를 전개하는 캐주얼 소통 문화</p>
+                        </div>
+                        <div class="card" style="border-top: 4px solid #34a853;">
+                            <div class="card-num">ASSET 02</div>
+                            <h3>📁 Google Drive 업로드</h3>
+                            <p><strong>개인 PC 보관을 최소화</strong>하고, <strong>Google Drive에 직접 업로드</strong>하여 <strong>공유 및 버전 관리</strong>를 실천하는 문화</p>
+                        </div>
+                        <div class="card" style="border-top: 4px solid #4285f4;">
+                            <div class="card-num">ASSET 03</div>
+                            <h3>📅 Google Calendar 일정</h3>
+                            <p>주요 회의, 미팅 및 외부 일정을 등록하여 구성원들의 시간을 <strong>투명하게 공유</strong>하는 일정 문화</p>
+                        </div>
+                    </div>
+                    <div class="card info-card" style="margin-top: 32px; padding: 20px 32px; border-left: 4px solid #8b95a1; background: #f9fafb; border-radius: 16px; text-align: center;">
+                        <p style="font-size: 16px; color: #4e5968; font-weight: 700;">💡 "각각의 자산들이 연동되지 않고 '독립적인 섬'처럼 작동하고 있다면 어떨까요?"</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: 한계점 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">The Challenge</span>
+                    <h2 class="slide-title animate-up delay-1">도구 간의 분절로 발생하는<br><span class="gradient">연결성과 맥락의 한계</span></h2>
+                    <p class="slide-desc animate-up delay-2">도구들이 서로 <strong>연동되지 않아</strong> 실무에서는 <strong>정보 탐색과 업데이트에 여전히 리소스가 소모</strong>됩니다.</p>
+                    
+                    <div class="grid-3 animate-up delay-3">
+                        <div class="card warn-card" style="border-left: 4px solid #f04438;">
+                            <h3>🔌 논의와 결과물의 단절</h3>
+                            <p>슬랙 스레드의 <strong>'논의 맥락'</strong>과 구글 드라이브의 <strong>'최종 결과 파일'</strong>이 연결되지 않아 <strong>히스토리 추적이 불가능</strong>합니다.</p>
+                        </div>
+                        <div class="card warn-card" style="border-left: 4px solid #f04438;">
+                            <h3>📊 일일 계획의 시각화 한계</h3>
+                            <p>일일 계획(구글 시트)은 <strong>단순 텍스트 박스 형태</strong>라 진행 상태 파악에 <strong>관리자의 수동 확인이 필수</strong>입니다.</p>
+                        </div>
+                        <div class="card warn-card" style="border-left: 4px solid #f04438;">
+                            <h3>🔄 일정 조율의 수동화</h3>
+                            <p>업무 데드라인 수정 시 <strong>슬랙 알림 후 캘린더를 수동으로 재수정</strong>해야 하는 번거로움이 존재합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: 칸반보드 개념 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Kanban Concept</span>
+                    <h2 class="slide-title animate-up delay-1">칸반보드(Kanban)란 무엇인가요?<br><span class="gradient">업무의 컨베이어 벨트, 가장 직관적인 시각화</span></h2>
+                    <p class="slide-desc animate-up delay-2">복잡한 구글 시트 표 대신, <strong>상태 카드로 업무 흐름을 눈으로 보며 관리</strong>하는 방법론입니다.</p>
+                    
+                    <div class="grid-2 animate-up delay-3">
+                        <div style="display: flex; flex-direction: column; gap: 16px; justify-content: center;">
+                            <div class="card info-card" style="border-left: 4px solid #3182f6;">
+                                <h3>💡 카드와 보드로 흐름 관리</h3>
+                                <p>모든 업무를 하나의 <strong>'카드'</strong>로 만들어 진행 상황에 따라 컬럼을 이동시킵니다. 공장의 컨베이어 벨트처럼 <strong>일이 어디서 막혀 있는지 즉시 파악</strong>할 수 있습니다.</p>
+                            </div>
+                            <div class="card info-card" style="border-left: 4px solid #3182f6;">
+                                <h3>🚀 "내 일의 진척"을 말없이 공유</h3>
+                                <p>팀원은 카드를 <strong>'진행 중'</strong> 또는 <strong>'완료'</strong>로 옮기기만 하면 끝입니다. <strong>별도 보고나 구두 확인 없이</strong> 전체 진행 상태를 파악할 수 있습니다.</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; justify-content: center; background: #f9fafb; border-radius: 24px; padding: 32px; border: 1px solid #e5e8eb;">
+                            <div style="text-align: center; width: 100%;">
+                                <div style="font-weight: 800; font-size: 18px; color: #191f28; margin-bottom: 24px;">🔄 칸반보드 표준 프로세스</div>
+                                <div style="display: flex; justify-content: space-around; align-items: center;">
+                                    <div style="background: #ffffff; padding: 12px 18px; border-radius: 12px; border: 1px solid #e5e8eb; font-weight: 700; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">할 일 (To Do)</div>
+                                    <div style="font-size: 20px; color: #3182f6; font-weight: bold;">➔</div>
+                                    <div style="background: #e8f3ff; padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(49, 130, 246, 0.2); font-weight: 700; font-size: 14px; color: #3182f6; box-shadow: 0 4px 10px rgba(49,130,246,0.05);">진행 중 (Progress)</div>
+                                    <div style="font-size: 20px; color: #3182f6; font-weight: bold;">➔</div>
+                                    <div style="background: #ffffff; padding: 12px 18px; border-radius: 12px; border: 1px solid #e5e8eb; font-weight: 700; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">완료 (Done)</div>
+                                </div>
+                                <p style="font-size: 13px; color: #8b95a1; margin-top: 24px; line-height: 1.4;">"복잡한 텍스트 보고에서 탈피하여,<br>카드가 이동하는 시각적 흐름으로 협업 신뢰를 구축합니다."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: 칸반보드 및 타임라인 인터랙티브 시뮬레이터 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Interactive Demo</span>
+                    <h2 class="slide-title animate-up delay-1">우리 팀의 실시간<br><span class="gradient">Notion 칸반 &amp; 타임라인 시뮬레이터</span></h2>
+                    <p class="slide-desc animate-up delay-2" style="margin-bottom: 1em;">아래 카드를 <strong>클릭</strong>하여 다음 단계로 이동시켜 보세요. <strong>상태 전환 및 프로젝트 일정이 어떻게 투명하게 관리되는지</strong> 직접 체감할 수 있습니다.</p>
+                    
+                    <!-- View Switch Tabs -->
+                    <div class="view-tabs animate-up delay-2">
+                        <button class="view-tab active" id="btnTabBoard" onclick="switchSlide5View('board')">📊 칸반 보드 뷰</button>
+                        <button class="view-tab" id="btnTabTimeline" onclick="switchSlide5View('timeline')">📅 타임라인 로드맵 뷰</button>
+                    </div>
+
+                    <!-- 1. Board View Container -->
+                    <div class="view-container active animate-up delay-3" id="viewBoardContainer">
+                        <div class="interactive-kanban">
+                            <!-- Column 1: To Do -->
+                            <div class="kanban-col-interactive" id="colTodo">
+                                <div class="kanban-col-header">
+                                    <span>🔵 할 일</span>
+                                    <span class="kanban-col-count" id="countTodo">3</span>
+                                </div>
+                                <div class="interactive-card" id="task1" onclick="moveInteractiveCard('task1')">
+                                    <span class="card-project">프로젝트 알파</span>
+                                    <h5 class="card-title">기획서 초안 작성</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">김지훈</span>
+                                        <span class="card-tag todo">To Do</span>
+                                    </div>
+                                </div>
+                                <div class="interactive-card" id="task2" onclick="moveInteractiveCard('task2')">
+                                    <span class="card-project">시스템 보안</span>
+                                    <h5 class="card-title">API 권한 설정</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">박대리</span>
+                                        <span class="card-tag todo">To Do</span>
+                                    </div>
+                                </div>
+                                <div class="interactive-card" id="task3" onclick="moveInteractiveCard('task3')">
+                                    <span class="card-project">신사업 기획</span>
+                                    <h5 class="card-title">시장조사 보고서</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">최팀장</span>
+                                        <span class="card-tag todo">To Do</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Column 2: In Progress -->
+                            <div class="kanban-col-interactive" id="colProgress">
+                                <div class="kanban-col-header">
+                                    <span>🟡 진행 중</span>
+                                    <span class="kanban-col-count" id="countProgress">3</span>
+                                </div>
+                                <div class="interactive-card" id="task4" onclick="moveInteractiveCard('task4')">
+                                    <span class="card-project">프로젝트 알파</span>
+                                    <h5 class="card-title">상세 UI/UX 디자인</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">이과장</span>
+                                        <span class="card-tag progress">In Progress</span>
+                                    </div>
+                                </div>
+                                <div class="interactive-card" id="task5" onclick="moveInteractiveCard('task5')">
+                                    <span class="card-project">마케팅 캠페인</span>
+                                    <h5 class="card-title">콘텐츠 가이드 수립</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">정사원</span>
+                                        <span class="card-tag progress">In Progress</span>
+                                    </div>
+                                </div>
+                                <div class="interactive-card" id="task6" onclick="moveInteractiveCard('task6')">
+                                    <span class="card-project">고객 지원</span>
+                                    <h5 class="card-title">Q&amp;A 챗봇 시나리오</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">박대리</span>
+                                        <span class="card-tag progress">In Progress</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Column 3: Review -->
+                            <div class="kanban-col-interactive" id="colReview">
+                                <div class="kanban-col-header">
+                                    <span>🟠 검토 중</span>
+                                    <span class="kanban-col-count" id="countReview">2</span>
+                                </div>
+                                <div class="interactive-card" id="task7" onclick="moveInteractiveCard('task7')">
+                                    <span class="card-project">프로젝트 알파</span>
+                                    <h5 class="card-title">DB 스키마 마이그레이션</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">김지훈</span>
+                                        <span class="card-tag review">Review</span>
+                                    </div>
+                                </div>
+                                <div class="interactive-card" id="task8" onclick="moveInteractiveCard('task8')">
+                                    <span class="card-project">시스템 보안</span>
+                                    <h5 class="card-title">OAuth 로그인 연동</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">이과장</span>
+                                        <span class="card-tag review">Review</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Column 4: Done -->
+                            <div class="kanban-col-interactive" id="colDone">
+                                <div class="kanban-col-header">
+                                    <span>🟢 완료</span>
+                                    <span class="kanban-col-count" id="countDone">2</span>
+                                </div>
+                                <div class="interactive-card" id="task9" onclick="moveInteractiveCard('task9')">
+                                    <span class="card-project">마케팅 캠페인</span>
+                                    <h5 class="card-title">프로모션 페이지 배포</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">정사원</span>
+                                        <span class="card-tag done">Done</span>
+                                    </div>
+                                </div>
+                                <div class="interactive-card" id="task10" onclick="moveInteractiveCard('task10')">
+                                    <span class="card-project">인프라 구축</span>
+                                    <h5 class="card-title">클라우드 서버 셋업</h5>
+                                    <div class="card-footer-interactive">
+                                        <span class="card-assignee">최팀장</span>
+                                        <span class="card-tag done">Done</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Timeline View Container -->
+                    <div class="view-container" id="viewTimelineContainer">
+                        <div class="interactive-timeline">
+                            <div class="timeline-header-grid">
+                                <div class="timeline-header-title">프로젝트 &amp; 태스크</div>
+                                <div class="timeline-grid-days">
+                                    <div>Week 1 (6/1 ~ 6/7)</div>
+                                    <div>Week 2 (6/8 ~ 6/14)</div>
+                                    <div>Week 3 (6/15 ~ 6/21)</div>
+                                </div>
+                            </div>
+                            <div class="timeline-rows">
+                                <!-- Row 1 -->
+                                <div class="timeline-row">
+                                    <div class="timeline-row-info">
+                                        <span class="timeline-row-project">프로젝트 알파</span>
+                                        <span class="timeline-row-task">기획서 초안 및 UX 설계</span>
+                                    </div>
+                                    <div class="timeline-track">
+                                        <div class="timeline-bar alpha" style="left: 0%; width: 55%;">김지훈 &middot; 이과장 (6/1 ~ 6/12)</div>
+                                    </div>
+                                </div>
+                                <!-- Row 2 -->
+                                <div class="timeline-row">
+                                    <div class="timeline-row-info">
+                                        <span class="timeline-row-project">시스템 보안</span>
+                                        <span class="timeline-row-task">OAuth 및 API 권한 설정</span>
+                                    </div>
+                                    <div class="timeline-track">
+                                        <div class="timeline-bar security" style="left: 20%; width: 45%;">박대리 &middot; 이과장 (6/5 ~ 6/14)</div>
+                                    </div>
+                                </div>
+                                <!-- Row 3 -->
+                                <div class="timeline-row">
+                                    <div class="timeline-row-info">
+                                        <span class="timeline-row-project">마케팅 캠페인</span>
+                                        <span class="timeline-row-task">프로모션 배포 및 가이드</span>
+                                    </div>
+                                    <div class="timeline-track">
+                                        <div class="timeline-bar marketing" style="left: 10%; width: 75%;">정사원 (6/3 ~ 6/19)</div>
+                                    </div>
+                                </div>
+                                <!-- Row 4 -->
+                                <div class="timeline-row">
+                                    <div class="timeline-row-info">
+                                        <span class="timeline-row-project">고객 지원 (챗봇)</span>
+                                        <span class="timeline-row-task">Q&amp;A 시나리오 작성</span>
+                                    </div>
+                                    <div class="timeline-track">
+                                        <div class="timeline-bar chatbot" style="left: 45%; width: 35%;">박대리 (6/10 ~ 6/17)</div>
+                                    </div>
+                                </div>
+                                <!-- Row 5 -->
+                                <div class="timeline-row">
+                                    <div class="timeline-row-info">
+                                        <span class="timeline-row-project">인프라 및 신사업</span>
+                                        <span class="timeline-row-task">클라우드 및 시장조사</span>
+                                    </div>
+                                    <div class="timeline-track">
+                                        <div class="timeline-bar infra" style="left: 0%; width: 90%;">최팀장 (6/1 ~ 6/20)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Slide 5: 새로운 제안 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">The New Proposal</span>
+                    <h2 class="slide-title animate-up delay-1">새로운 제안:<br><span class="gradient">Notion 칸반보드 & SECI 문서화</span></h2>
+                    <p class="slide-desc animate-up delay-2">전체 업무의 상태를 <strong>역동적으로 추적</strong>하고, <strong>휘발성 대화를 지식 자산으로 전환</strong>합니다.</p>
+                    
+                    <div class="grid-2 animate-up delay-3">
+                        <div class="card info-card" style="border-left: 4px solid #3182f6;">
+                            <div style="font-size: 28px; margin-bottom: 12px;">📊</div>
+                            <h3>1. Notion 칸반보드를 통한 이슈 트래킹</h3>
+                            <p style="margin-bottom: 12px;">모든 업무를 <strong>상태별 카드</strong>로 관리하여 <strong>병목 지점을 즉시 감지</strong>하고 실시간 진척을 업데이트합니다.</p>
+                        </div>
+                        <div class="card info-card" style="border-left: 4px solid #3182f6;">
+                            <div style="font-size: 28px; margin-bottom: 12px;">📖</div>
+                            <h3>2. SECI 모델 기반 지식 자산화</h3>
+                            <p style="margin-bottom: 12px;"><strong>슬랙의 휘발성 대화</strong>를 정립된 <strong>노션 기획/회의록(형식지)</strong>으로 변환하여 <strong>업무 연속성을 보장</strong>합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Wow Point -->
+            <div class="slide">
+                <div class="slide-content" style="text-align: center; align-items: center;">
+                    <span class="segment-label animate-up">Wow Point</span>
+                    <h2 class="slide-title animate-up delay-1" style="font-size: 46px;">노션 도입이 일으킬<br><span class="gradient">통합의 파장 효과 (Ripple Effect)</span></h2>
+                    <p class="slide-desc animate-up delay-2" style="max-width: 800px; margin-bottom: 24px;">
+                        노션은 단순한 <strong>툴 하나를 늘리는 것이 아닙니다.</strong> 기존에 분절되어 존재하던 도구들을 <strong>강력한 접착제처럼 연결</strong>하여 <strong>하나의 거대한 협업 생태계</strong>로 진화시키는 <strong>트리거</strong>입니다.
+                    </p>
+                    
+                    <div class="animate-up delay-3" style="display: flex; align-items: center; justify-content: center; gap: 24px; width: 100%; margin-top: 24px;">
+                        <div class="arch-card slack" style="width: 250px; flex-shrink: 0; padding: 24px;">
+                            <div class="arch-logo-wrapper" style="width: 48px; height: 48px; font-size: 20px; margin-bottom: 12px;">💬</div>
+                            <h4>기존 자산: Slack</h4>
+                            <p>스레드 중심 소통</p>
+                        </div>
+                        <div style="font-size: 28px; color: #3182f6; font-weight: 800; flex-shrink: 0;">➕</div>
+                        <div class="arch-card notion" style="width: 280px; border-color: #3182f6; box-shadow: 0 0 20px rgba(49, 130, 246, 0.15); flex-shrink: 0; padding: 28px;">
+                            <div class="arch-logo-wrapper" style="background: linear-gradient(135deg, #3182f6 0%, #1048b0 100%); width: 56px; height: 56px; font-size: 24px; margin-bottom: 12px;">📝</div>
+                            <h4 style="color: #3182f6;">신규 제안: Notion</h4>
+                            <p style="color: #3182f6; font-weight: 700;">칸반 & SECI 문서화</p>
+                        </div>
+                        <div style="font-size: 28px; color: #3182f6; font-weight: 800; flex-shrink: 0;">➕</div>
+                        <div class="arch-card drive" style="width: 250px; flex-shrink: 0; padding: 24px;">
+                            <div class="arch-logo-wrapper" style="width: 48px; height: 48px; font-size: 20px; margin-bottom: 12px;">📁</div>
+                            <h4>기존 자산: Drive & Cal</h4>
+                            <p>자료 보관 & 일정 관리</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: 파장 효과 01 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Ripple Effect 01</span>
+                    <h2 class="slide-title animate-up delay-1">Notion ↔ Slack 연동<br><span class="gradient">소통의 맥락과 태스크의 즉시 연결</span></h2>
+                    <p class="slide-desc animate-up delay-2">슬랙의 <strong>논의 스레드 링크를 노션 카드에 매핑</strong>하여 <strong>논의 역사가 그대로 유지</strong>됩니다.</p>
+                    
+                    <div class="grid-2 animate-up delay-3">
+                        <div class="slack-mockup">
+                            <div class="slack-sidebar">
+                                <div style="font-weight: 800; font-size: 14px; color: white;">Channels</div>
+                                <div class="slack-sidebar-channel"># project-alpha</div>
+                                <div># general</div>
+                            </div>
+                            <div class="slack-body">
+                                <div class="slack-msg">
+                                    <div class="slack-avatar">N</div>
+                                    <div class="slack-msg-content">
+                                        <h5>Notion Bot</h5>
+                                        <p><strong>[알파 기획서 보완]</strong> 카드가 <span style="color:#e28743; font-weight:700;">[Review]</span> 상태로 이동되었습니다.<br>검토자: @이과장</p>
+                                        <button class="slack-thread-btn" onclick="toggleSlackThread()">💬 관련 논의 스레드 보기</button>
+                                    </div>
+                                </div>
+                                <div class="slack-thread-panel" id="slackThreadPanel">
+                                    <div style="font-size: 12px; color: #4e5968;"><strong>이과장:</strong> 네, 확인했습니다. 검토 시작할게요.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+                            <div class="card info-card" style="border-left: 4px solid #3182f6; padding: 24px;">
+                                <h3 style="font-size: 18px; margin-bottom: 8px; color: #3182f6;">깔끔한 알림망</h3>
+                                <p style="font-size: 14px;">노션 칸반보드에서 <strong>상태 변경 시 슬랙 채널로 알림이 자동 전송</strong>됩니다. <strong>불필요한 질의응답 시간을 대폭 줄입니다.</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: 파장 효과 02 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Ripple Effect 02</span>
+                    <h2 class="slide-title animate-up delay-1">Notion ↔ Google Drive 연동<br><span class="gradient">태스크와 최종 결과물의 일원화</span></h2>
+                    <p class="slide-desc animate-up delay-2">구글 드라이브의 <strong>파일 링크가 노션 카드 안에 내장</strong>되어 <strong>탐색 시간이 제로</strong>가 됩니다.</p>
+                    
+                    <div class="grid-2 animate-up delay-3">
+                        <div class="kanban-mockup">
+                            <div class="kanban-cols">
+                                <div class="kanban-col"><div class="kanban-col-title">🔵 To Do</div></div>
+                                <div class="kanban-col">
+                                    <div class="kanban-col-title">🟡 In Progress</div>
+                                    <div class="kanban-card">알파 기획서 보완<br>
+                                        <div style="font-size: 0.85em; color: #34a853; margin-top: 4px; font-weight: 700;">🔗 Drive: 알파_최종본</div>
+                                    </div>
+                                </div>
+                                <div class="kanban-col"><div class="kanban-col-title">🟠 Review</div></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+                            <div class="card info-card" style="border-left: 4px solid #3182f6;">
+                                <h3 style="color: #3182f6;">자료 검색 코스트 제로</h3>
+                                <p>모든 <strong>태스크 카드 안에 드라이브 링크가 내장</strong>되어, 카드를 여는 순간 <strong>파일까지 원스톱으로 접근</strong>할 수 있습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: 파장 효과 03 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Ripple Effect 03</span>
+                    <h2 class="slide-title animate-up delay-1">Notion ↔ Google Calendar 연동<br><span class="gradient">태스크 기한과 일정 공유의 자동 조율</span></h2>
+                    <p class="slide-desc animate-up delay-2">노션 카드의 <strong>마감일이 구글 캘린더에 양방향 동기화</strong>되어 <strong>일정이 자동 업데이트</strong>됩니다.</p>
+                    
+                    <div class="sync-mockup animate-up delay-3">
+                        <div class="sync-card" style="justify-content: center;">
+                            <h4 style="font-weight: 700; color: #191f28; display: flex; align-items: center; gap: 8px;">📝 Notion Task Card</h4>
+                            <div style="border: 1px solid #e5e8eb; padding: 1em; border-radius: 12px; background: #f9fafb;">
+                                <div style="font-weight: 700;">[알파] 기획서 최종 마감</div>
+                                <div style="color: #3182f6; margin-top: 4px; font-weight: 600;">기한: 06-12 (금)</div>
+                            </div>
+                        </div>
+                        <div class="sync-card">
+                            <div class="sync-card-title">📅 Google Calendar Sync</div>
+                            <div class="cal-event-list">
+                                <div class="cal-event" style="border-left-color: #3182f6; background: #e8f3ff;">
+                                    <h6>[알파] 기획서 최종 마감 (Sync)</h6>
+                                    <p>06-12 (금) 오전 10:00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10: 종합 비교 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Before & After</span>
+                    <h2 class="slide-title animate-up delay-1">흩어져 있던 도구들이<br><span class="gradient">하나의 유기적 생태계로</span></h2>
+                    <p class="slide-desc animate-up delay-2">노션의 도입이 가져올 <strong>전후의 근본적 생산성 차이</strong>입니다.</p>
+                    
+                    <div class="summary-box animate-up delay-3">
+                        <div class="summary-col bad-col">
+                            <h4>❌ AS-IS</h4>
+                            <div class="summary-list">
+                                <div class="summary-item">드라이브: <span class="highlight">맥락과 단절된 저장소</span></div>
+                                <div class="summary-item">슬랙: <span class="highlight">스레드 논의 유실</span></div>
+                                <div class="summary-item">일정: <span class="highlight">수동 입력 데드라인 불일치</span></div>
+                            </div>
+                        </div>
+                        <div class="summary-arrow">➡</div>
+                        <div class="summary-col good-col">
+                            <h4>🔵 TO-BE</h4>
+                            <div class="summary-list">
+                                <div class="summary-item">드라이브: <span class="highlight">태스크 연동 일체화</span></div>
+                                <div class="summary-item">슬랙: <span class="highlight">알림 및 카드 맵핑</span></div>
+                                <div class="summary-item">일정: <span class="highlight">양방향 자동 동기화</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: 기대 효과 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Expected ROI</span>
+                    <h2 class="slide-title animate-up delay-1">이 생태계를 구축하면<br><span class="gradient">어떤 변화가 나타날까요?</span></h2>
+                    <p class="slide-desc animate-up delay-2">조직 운영 및 관리 효율성의 <strong>정량적 향상 지표</strong>입니다.</p>
+                    
+                    <div class="grid-3 animate-up delay-3">
+                        <div class="metric-card">
+                            <div class="metric-value">90%</div>
+                            <div class="metric-title">정보 공유 비용 감소</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">50%</div>
+                            <div class="metric-title">온보딩 속도 단축</div>
+                        </div>
+                        <div class="metric-card" style="border-color: rgba(49, 130, 246, 0.2);">
+                            <div class="metric-value">0%</div>
+                            <div class="metric-title">업무 유실율 제로</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 12: 로드맵 & 규칙 -->
+            <div class="slide">
+                <div class="slide-content">
+                    <span class="segment-label animate-up">Roadmap & Rules</span>
+                    <h2 class="slide-title animate-up delay-1">정착 로드맵 및<br><span class="gradient">조직원 5대 행동 강령</span></h2>
+                    <p class="slide-desc animate-up delay-2">성공적인 정착을 위한 <strong>마일스톤</strong>과 매일 준수해야 할 <strong>핵심 그라운드 룰</strong>입니다.</p>
+                    
+                    <div class="roadmap-container animate-up delay-3">
+                        <div class="roadmap-step">
+                            <div class="roadmap-step-header">
+                                <div class="roadmap-badge">1</div>
+                                <h4 style="font-size: 15px; font-weight: 700;">시스템 셋업 (W1)</h4>
+                            </div>
+                            <p style="font-size: 12px; color: #6b7684;"><strong>드라이브 폴더 트리화</strong> 및 <strong>Notion 템플릿 설계</strong>, 도구 간 <strong>API 연동 및 테스트 완료</strong></p>
+                        </div>
+                        <div class="roadmap-step">
+                            <div class="roadmap-step-header">
+                                <div class="roadmap-badge">2</div>
+                                <h4 style="font-size: 15px; font-weight: 700;">시범 프로젝트 적용 (W2)</h4>
+                            </div>
+                            <p style="font-size: 12px; color: #6b7684;"><strong>1개 핵심 부서/프로젝트 시범 도입</strong> 및 실무 피드백을 기반으로 <strong>템플릿 보완</strong></p>
+                        </div>
+                        <div class="roadmap-step active-step">
+                            <div class="roadmap-step-header">
+                                <div class="roadmap-badge">3</div>
+                                <h4 style="font-size: 15px; font-weight: 700;">전사 확산 및 안착 (W3)</h4>
+                            </div>
+                            <p style="font-size: 12px; color: #6b7684;"><strong>전사 교육 실시</strong> 및 <strong>5대 그라운드 룰 선포</strong>, <strong>완전 전환을 통한 협업 혁신 안착</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="rules-grid animate-up delay-4">
+                        <div class="rule-item">
+                            <div class="rule-icon">💬</div>
+                            <div>DM 금지 스레드 활용</div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-icon">🔗</div>
+                            <div>드라이브 링크 단일화</div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-icon">⏱️</div>
+                            <div>일 10분 칸반 최신화</div>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-icon">📝</div>
+                            <div>구두 지시 기록 의무</div>
+                        </div>
+                        <div class="rule-item" style="border-color: rgba(49, 130, 246, 0.2); background: rgba(49, 130, 246, 0.02);">
+                            <div class="rule-icon">📅</div>
+                            <div>회의 후 10분 Action Item화</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer Controls -->
+    <footer>
+        <div class="help-tip">←, → 또는 스페이스바로 이동이 가능합니다.</div>
+        <div class="page-dots" id="pageDots">
+            <!-- Rendered by JS -->
+        </div>
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" disabled>&lt;</button>
+            <button class="nav-btn" id="nextBtn">&gt;</button>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic JavaScript -->
+    <script>
+        const wrapper = document.getElementById('slidesWrapper');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const pageDotsContainer = document.getElementById('pageDots');
+        const slideIndicator = document.getElementById('slideIndicator');
+        const progressBar = document.getElementById('progressBar');
+        
+        let currentSlideIndex = 0;
+        const totalSlides = slides.length;
+
+        // Initialize Page Indicator Dots
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            pageDotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        // Initial setup for dynamic slides counts
+        updateControls();
+
+        function updateControls() {
+            // Update buttons disabled state
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+
+            // Update page dots active class
+            dots.forEach((dot, index) => {
+                if (index === currentSlideIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Update Top Progress bar
+            const percentage = ((currentSlideIndex + 1) / totalSlides) * 100;
+            progressBar.style.width = `${percentage}%`;
+
+            // Update Badge indicator
+            slideIndicator.innerText = `${currentSlideIndex + 1} / ${totalSlides}`;
+        }
+
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+            
+            // Deactivate previous slide animate class
+            slides[currentSlideIndex].classList.remove('active-slide');
+            
+            // Slide wrapper transition - percentage based for 16:9 container
+            wrapper.style.transform = `translateX(-${index * 100}%)`;
+            
+            // Set new active slide index
+            currentSlideIndex = index;
+            
+            // Activate new slide class for scroll-up text trigger
+            slides[currentSlideIndex].classList.add('active-slide');
+            
+            updateControls();
+        }
+
+        // Navigation Button Listeners
+        prevBtn.addEventListener('click', () => goToSlide(currentSlideIndex - 1));
+        nextBtn.addEventListener('click', () => goToSlide(currentSlideIndex + 1));
+
+        // Keyboard Event Listeners
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                goToSlide(currentSlideIndex + 1);
+            } else if (event.key === 'ArrowLeft' || event.key === 'Backspace') {
+                event.preventDefault();
+                goToSlide(currentSlideIndex - 1);
+            }
+        });
+
+        // Slack Thread Toggle Interactive Simulation (Slide 6)
+        function toggleSlackThread() {
+            const panel = document.getElementById('slackThreadPanel');
+            if (panel.style.display === 'flex') {
+                panel.style.display = 'none';
+            } else {
+                panel.style.display = 'flex';
+            }
+        }
+
+        // Notion Kanban Interactive Card Move Simulation (Slide 7)
+        let isCardMoved = false;
+        function animateKanbanDemo() {
+            const card = document.getElementById('demoCard');
+            const reviewCol = document.getElementById('reviewCol');
+            
+            if (!isCardMoved) {
+                // Move card to Review Column
+                if (card && reviewCol) {
+                    card.style.transform = 'scale(0.8)';
+                    card.style.opacity = '0.3';
+                    
+                    setTimeout(() => {
+                        reviewCol.appendChild(card);
+                        card.style.transform = 'scale(1)';
+                        card.style.opacity = '1';
+                        
+                        // Style tag to review
+                        const tag = card.querySelector('.kanban-tag');
+                        if (tag) {
+                            tag.innerText = '검토(Review) 요청';
+                            tag.style.background = '#ffe8e8';
+                            tag.style.color = '#f04438';
+                        }
+                    }, 400);
+                }
+                
+                isCardMoved = true;
+            } else {
+                // Return card to In Progress Column
+                const inProgressCol = document.querySelectorAll('.kanban-col')[1];
+                if (card && inProgressCol) {
+                    card.style.transform = 'scale(0.8)';
+                    card.style.opacity = '0.3';
+                    
+                    setTimeout(() => {
+                        inProgressCol.appendChild(card);
+                        card.style.transform = 'scale(1)';
+                        card.style.opacity = '1';
+                        
+                        // Style tag back
+                        const tag = card.querySelector('.kanban-tag');
+                        if (tag) {
+                            tag.innerText = '기획';
+                            tag.style.background = '#e8f3ff';
+                            tag.style.color = '#3182f6';
+                        }
+                    }, 400);
+                }
+                
+                isCardMoved = false;
+            }
+        }
+
+        // Slide 5 Interactive Viewer (Kanban & Timeline Switcher)
+        function switchSlide5View(viewType) {
+            const tabBoard = document.getElementById('btnTabBoard');
+            const tabTimeline = document.getElementById('btnTabTimeline');
+            const viewBoard = document.getElementById('viewBoardContainer');
+            const viewTimeline = document.getElementById('viewTimelineContainer');
+            
+            if (viewType === 'board') {
+                tabBoard.classList.add('active');
+                tabTimeline.classList.remove('active');
+                viewBoard.classList.add('active');
+                viewBoard.style.display = 'block';
+                viewTimeline.classList.remove('active');
+                viewTimeline.style.display = 'none';
+            } else {
+                tabBoard.classList.remove('active');
+                tabTimeline.classList.add('active');
+                viewBoard.classList.remove('active');
+                viewBoard.style.display = 'none';
+                viewTimeline.classList.add('active');
+                viewTimeline.style.display = 'block';
+            }
+        }
+
+        // Slide 5 Interactive Card Move Action
+        function moveInteractiveCard(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const currentCol = card.parentElement;
+            let nextColId = '';
+            let newTagClass = '';
+            let newTagText = '';
+            
+            if (currentCol.id === 'colTodo') {
+                nextColId = 'colProgress';
+                newTagClass = 'progress';
+                newTagText = 'In Progress';
+            } else if (currentCol.id === 'colProgress') {
+                nextColId = 'colReview';
+                newTagClass = 'review';
+                newTagText = 'Review';
+            } else if (currentCol.id === 'colReview') {
+                nextColId = 'colDone';
+                newTagClass = 'done';
+                newTagText = 'Done';
+            } else {
+                nextColId = 'colTodo';
+                newTagClass = 'todo';
+                newTagText = 'To Do';
+            }
+            
+            const nextCol = document.getElementById(nextColId);
+            if (!nextCol) return;
+            
+            // Add transitioning effect
+            card.classList.add('card-moving');
+            
+            setTimeout(() => {
+                // Append card to next column DOM
+                nextCol.appendChild(card);
+                
+                // Update Badge style inside card
+                const tag = card.querySelector('.card-tag');
+                if (tag) {
+                    tag.className = `card-tag ${newTagClass}`;
+                    tag.innerText = newTagText;
+                }
+                
+                // Recalculate Column Counts
+                updateInteractiveColCounts();
+                
+                card.classList.remove('card-moving');
+            }, 180);
+        }
+
+        function updateInteractiveColCounts() {
+            const cols = ['Todo', 'Progress', 'Review', 'Done'];
+            cols.forEach(col => {
+                const container = document.getElementById(`col${col}`);
+                const countBadge = document.getElementById(`count${col}`);
+                if (container && countBadge) {
+                    const cards = container.querySelectorAll('.interactive-card');
+                    countBadge.innerText = cards.length;
+                }
+            });
+        }
+    </script>
+
+    </div><!-- /.presentation-container -->
+</body>
+</html>
